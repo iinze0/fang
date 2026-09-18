@@ -6,7 +6,8 @@ By [iinze0](https://github.com/iinze0).
 
 ```
 fang/
-├── fang.sh          # FANG v42 — main dispatcher
+├── fang.sh          # main dispatcher
+├── update.sh        # pull latest from GitHub
 ├── lib/
 │   ├── common.sh
 │   ├── targets.sh
@@ -17,16 +18,39 @@ fang/
 └── data/
 ```
 
-## Run
+## Install
+
+Repo is **private**. Clone with HTTPS + a [personal access token](https://github.com/settings/tokens), or SSH.
 
 ```bash
-git clone https://github.com/iinze0/fang.git
+git clone git@github.com:iinze0/fang.git
 cd fang
-chmod +x fang.sh
+chmod +x fang.sh update.sh lib/*.sh
 sudo ./fang.sh
 ```
 
-Root is required. Option `99` in the menu installs the packages the script expects (`bettercap`, `iptables`, `tshark`, `nmap`, `arp-scan`, `macchanger`, and related tools).
+Root is required. Option `99` in the menu installs packages the script expects.
+
+## Update
+
+From the clone directory:
+
+```bash
+chmod +x update.sh
+./update.sh
+```
+
+Same thing by hand:
+
+```bash
+cd fang
+git pull origin main
+chmod +x fang.sh update.sh lib/*.sh
+```
+
+If you copied files without `git clone`, there is nothing to pull — clone the repo once, then use `update.sh` after that.
+
+Docs page: [docs/index.html](docs/index.html) (same install + update commands).
 
 ## Menu (high level)
 
