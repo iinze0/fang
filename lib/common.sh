@@ -1,62 +1,72 @@
-#!/usr/bin/env bash
-# shared helpers
+#!/bin/bash
+# FANG common — helpers, paths, health
 
-die()  { printf '[-] %s\n' "$*" >&2; exit 1; }
-ok()   { printf '[+] %s\n' "$*"; }
-info() { printf '[*] %s\n' "$*"; }
-warn() { printf '[!] %s\n' "$*" >&2; }
+set -o pipefail
 
-common_init() {
-  mkdir -p "$FANG_DATA" "$FANG_LOG_DIR"
-  [[ -f "$FANG_TARGETS" ]] || : > "$FANG_TARGETS"
+R='\033[0;31m'; G='\033[0;32m'; Y='\033[1;33m'
+C='\033[0;36m'; P='\033[0;35m'; B='\033[1m'
+D='\033[2m';   N='\033[0m'
+
+FANG_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DATA_DIR="${FANG_ROOT}/data"
+CUSTOM_DIR="${FANG_ROOT}/fang_custom"
+LOG_FILE="${DATA_DIR}/fang.log"
+SAVE="${DATA_DIR}/targets.txt"
+WHITE="${DATA_DIR}/whitelist.txt"
+NICKF="${DATA_DIR}/nicks.txt"
+HOSTF="${DATA_DIR}/hosts.txt"
+HIST="${DATA_DIR}/history.txt"
+FAV="${DATA_DIR}/favorites.txt"
+SESSION_FILE="${DATA_DIR}/session.env"
+IDENTITY_FILE="${DATA_DIR}/identity.env"
+PERSIST="/etc/fang_persist.conf"
+SERVICE="/etc/systemd/system/fang.service"
+
+COMMENT_TAG="FANG"
+
+ok()   { echo -e "\n  ${G}✔  $*${N}"; }
+err()  { echo -e "\n  ${R}✖  $*${N}"; }
+info() { echo -e "\n  ${Y}▸  $*${N}"; }
+ask()  { read -p "$(echo -e "  ${Y}$* [y/N]: ${N}")" a; [[ $a =~ ^[Yy]$ ]]; }
+pause(){ echo; read -p "  Press Enter..."; }
+log()  { echo "[$(date '+%F %T')] $*" >> "$LOG_FILE"; }
+
+valid_ip() { [[ $1 =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; }
+
+require_root() {
+    [[ $EUID -eq 0 ]] || { err "Run as root: sudo ./fang.sh"; exit 1; }
 }
 
-common_require_cmd() {
-  local c
-  for c in "$@"; do
-    command -v "$c" >/dev/null 2>&1 || die "missing command: $c"
-  done
+init_dirs() {
+    mkdir -p "$DATA_DIR" "$CUSTOM_DIR"
+    touch "$LOG_FILE"
 }
 
-common_sudo() {
-  if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-    "$@"
-  elif command -v sudo >/dev/null 2>&1; then
-    sudo "$@"
-  else
-    die "need root or sudo for: $*"
-  fi
-}
+# ── Health check ──────────────────────────────────────────
+health_check() {
+    local issues=0
+    info "Health check"
 
-# 00:11:22:33:44:55 or 001122334455 -> colon form
-common_norm_addr() {
-  local raw="${1//[:.-]/}"
-  raw="$(printf '%s' "$raw" | tr '[:lower:]' '[:upper:]')"
-  [[ "$raw" =~ ^[0-9A-F]{12}$ ]] || return 1
-  printf '%s:%s:%s:%s:%s:%s\n' \
-    "${raw:0:2}" "${raw:2:2}" "${raw:4:2}" \
-    "${raw:6:2}" "${raw:8:2}" "${raw:10:2}"
-}
+    if [[ -z ${IFACE:-} ]] || ! ip link show "$IFACE" &>/dev/null; then
+        err "Interface invalid or down"; ((issues++))
+    else
+        ok "Interface $IFACE exists"
+    fi
 
-# colon form -> 12 hex no separators (redfang -r style)
-common_flat_addr() {
-  local n
-  n="$(common_norm_addr "$1")" || return 1
-  printf '%s\n' "${n//:/}"
-}
+    if [[ $(cat /proc/sys/net/ipv4/ip_forward 2>/dev/null) != 1 ]]; then
+        info "Enabling IP forwarding..."
+        echo 1 > /proc/sys/net/ipv4/ip_forward
+    fi
+    [[ $(cat /proc/sys/net/ipv4/ip_forward) == 1 ]] && ok "IP forwarding ON" || { err "IP forwarding failed"; ((issues++)); }
 
-common_ts() { date +'%Y%m%d-%H%M%S'; }
+    command -v bettercap &>/dev/null && ok "bettercap" || { err "bettercap missing"; ((issues++)); }
+    command -v iptables  &>/dev/null && ok "iptables"  || { err "iptables missing"; ((issues++)); }
 
-common_logfile() {
-  local name="${1:-fang}"
-  printf '%s/%s-%s.log\n' "$FANG_LOG_DIR" "$name" "$(common_ts)"
-}
+    command -v arp-scan &>/dev/null && ok "arp-scan" || info "arp-scan optional"
+    command -v nmap     &>/dev/null && ok "nmap"     || info "nmap optional"
+    command -v macchanger &>/dev/null && ok "macchanger" || info "macchanger optional"
+    command -v tor &>/dev/null || command -v anonsurf &>/dev/null && ok "Tor/Anonsurf" || info "Tor optional"
 
-common_confirm_authorized() {
-  if [[ "${FANG_AUTHORIZED:-0}" == "1" ]]; then
-    return 0
-  fi
-  warn "Authorized testing only. Type YES to continue."
-  read -r -p "  confirm> " ans
-  [[ "$ans" == "YES" ]] || die "aborted"
+    ((issues > 0)) && err "$issues critical issue(s)" || ok "Health OK"
+    return $issues
 }
