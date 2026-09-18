@@ -1,101 +1,81 @@
-# fang (redfang)
+# fang
 
-Kali Linux ships **redfang** as the command `fang`.
+Kali-oriented Bluetooth recon CLI. Layout:
 
-**fang** is a small proof-of-concept Bluetooth hunter. It finds devices that are *not* in discoverable mode by brute-forcing the last six bytes of a Bluetooth address (BD_ADDR) and calling `hci_read_remote_name()`.
+```
+fang/
+├── fang.sh
+├── lib/
+│   ├── common.sh
+│   ├── targets.sh
+│   ├── ui.sh
+│   ├── scan.sh
+│   ├── attack.sh
+│   └── anon.sh
+└── data/
+```
 
-- Package name: `redfang`
-- Binary name: `fang`
-- Version in Kali: 2.5
-- Original authors: Ollie Whitehouse (@stake), Simon Halsall (threads), Stephen Kapp (device info)
-- Year: 2003
+Wraps BlueZ (`hcitool`, `l2ping`, `sdptool`, `hciconfig`) and Kali’s **redfang** binary (`fang`) for authorized lab work.
 
-This repository documents how to install and use the tool on Kali. It is **not** a rewrite of the original C source.
-
-## Legal / ethics
-
-Only scan devices and networks you own or have explicit written permission to test. Unauthorized Bluetooth scanning or pairing can be illegal.
-
-## Install on Kali Linux
+## Install
 
 ```bash
 sudo apt update
-sudo apt install redfang
+sudo apt install redfang bluez
+git clone https://github.com/iinze0/fang.git
+cd fang
+chmod +x fang.sh
 ```
 
-Dependencies: `libbluetooth3`, `libc6`.
-
-You need a working Bluetooth adapter (`hci0` or similar):
+Adapter:
 
 ```bash
-hciconfig
 sudo hciconfig hci0 up
+./fang.sh hci
 ```
 
 ## Usage
 
-```text
-fang [options]
-
-  -r    range      e.g. 00803789EE76-00803789EEff
-  -o    filename   write scan results to a text logfile
-  -t    timeout    connect timeout (default 10000)
-  -n    num        number of Bluetooth dongles / threads
-  -d               debug
-  -s               also perform standard Bluetooth discovery
-  -l               list device manufacturer codes
-  -h               help
-```
-
-Addresses are 12 hex characters (no colons). You can also use `manf+nnnnnn` after listing manufacturers with `-l`.
-
-HCI devices are assumed to be `hci0` … `hci(n-1)` when `-n` is set.
-
-### Example (from Kali docs)
-
 ```bash
-fang -r 00803789EE76-00803789EEff -s
+./fang.sh                 # menu
+./fang.sh help
+
+./fang.sh scan inquiry
+./fang.sh scan range 00803789EE76-00803789EEff
+./fang.sh scan name 00:11:22:33:44:55
+./fang.sh scan lescan 10
+
+./fang.sh targets add 00:11:22:33:44:55 lab-speaker
+./fang.sh targets list
+
+./fang.sh assess name     # also: ping | sdp | all
+./fang.sh anon harden     # local radio: noscan
+./fang.sh anon restore
 ```
 
-Typical output starts like:
+`assess` is an alias for `attack`. It only runs name lookup, L2CAP echo, and public SDP browse against **saved** targets, and asks you to type `YES` unless `FANG_AUTHORIZED=1`.
 
-```text
-redfang - the bluetooth hunter ver 2.5
-(c)2003 @stake Inc
-Scanning 138 address(es)
-Address range 00:80:37:89:ee:76 -> 00:80:37:89:ee:ff
-Performing Bluetooth Discovery...
-```
+## Env
 
-### Practical notes
+| Variable | Default |
+|---|---|
+| `FANG_HCI` | `hci0` |
+| `FANG_DATA` | `./data` |
+| `FANG_TARGETS` | `./data/targets.txt` |
+| `FANG_AUTHORIZED` | unset (prompt) |
+| `SCAN_TIMEOUT` | redfang default |
+| `SCAN_DISCOVERY` | `0` (`1` adds redfang `-s`) |
 
-- Full 24-bit suffix space is large. Narrow the range using a known vendor OUI (`fang -l`) when you can.
-- Increase `-t` if you miss devices; the default is faster but less reliable.
-- Multiple USB dongles (`-n`) were the original way to speed up scans.
-- Classic Bluetooth (BR/EDR) only. This is not a BLE advert scanner.
+## Scope
 
-## Build from source (optional)
+- Inquiry and LE scan for devices that are advertising
+- redfang range hunt for classic addresses you already have a prefix for
+- Operator hygiene: hide *your* adapter (`noscan`)
 
-Upstream tarball is `redfang 2.5`. A public copy of the C sources lives at [deltj/redfang](https://github.com/deltj/redfang).
+Not in scope: exploit payloads, pairing attacks, spoofing other devices, or unattended wide scans of third parties.
 
-On Debian/Kali-style systems:
+Use only on equipment you own or have written permission to test.
 
-```bash
-sudo apt install build-essential libbluetooth-dev
-git clone https://github.com/deltj/redfang.git
-cd redfang
-make
-# binary is named fang
-```
+## Upstream
 
-You may need `#include <linux/limits.h>` in `fang.c` on modern kernels (Arch/Kali packaging already patches this).
-
-## Official references
-
-- [Kali tool page: redfang](https://www.kali.org/tools/redfang/)
-- Install: `sudo apt install redfang`
-- Historical announcement: RedFang 2.5, @stake / QinetiQ FORWARD project (2003)
-
-## Why this repo exists
-
-`fang` is easy to confuse with other projects of the same name (hash crackers, recon frameworks, DDoS kits, camera firmware hacks). This repo is specifically about **Kali’s Bluetooth hunter** (`redfang` / `fang`).
+Kali package: `redfang` — https://www.kali.org/tools/redfang/
