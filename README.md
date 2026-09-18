@@ -1,12 +1,12 @@
-# fang
+# FANG
 
-**fang** is a modular CLI for authorized Bluetooth recon on Kali / Debian-style boxes.
+Modular network toolkit for Kali. Interactive menu: pick an interface, discover hosts, set targets, run sessions, watch traffic, toggle anonymity helpers.
 
 By [iinze0](https://github.com/iinze0).
 
 ```
 fang/
-├── fang.sh
+├── fang.sh          # FANG v42 — main dispatcher
 ├── lib/
 │   ├── common.sh
 │   ├── targets.sh
@@ -17,38 +17,27 @@ fang/
 └── data/
 ```
 
-## Install
+## Run
 
 ```bash
 git clone https://github.com/iinze0/fang.git
 cd fang
 chmod +x fang.sh
-./fang.sh help
+sudo ./fang.sh
 ```
 
-Needs BlueZ tools (`hcitool`, `hciconfig`, optionally `l2ping` / `sdptool`).
+Root is required. Option `99` in the menu installs the packages the script expects (`bettercap`, `iptables`, `tshark`, `nmap`, `arp-scan`, `macchanger`, and related tools).
 
-```bash
-sudo apt install bluez
-sudo hciconfig hci0 up
-```
+## Menu (high level)
 
-## Commands
-
-```bash
-./fang.sh                 # menu
-./fang.sh scan inquiry
-./fang.sh scan range START-END
-./fang.sh scan name ADDR
-./fang.sh targets add ADDR [note]
-./fang.sh assess name     # name | ping | sdp | all
-./fang.sh anon harden
-```
-
-`assess` / `attack` only runs against addresses in `data/targets.txt` and asks for `YES` unless `FANG_AUTHORIZED=1`.
+- Discovery — quick / deep scan, list hosts, nicknames, set single or multi target, protect this host, vendor filter
+- Sessions — lag / kill / timed session, stop, reapply, ping check, session status
+- Monitor — live traffic, rule / latency view
+- Anonymity — ghost mode and anon menu
+- System — custom dir, persistence toggle, save / log, deps install, quit
 
 ## License
 
 MIT — see `LICENSE`.
 
-Use only on systems and radios you own or have written permission to test.
+Only use on networks you own or have written permission to test.
