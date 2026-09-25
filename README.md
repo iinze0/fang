@@ -2,9 +2,12 @@
 
 Modular network toolkit for Kali.
 
-Made by [iinze0](https://github.com/iinze0) · [MIT](LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-0b7285?style=flat-square)](LICENSE)
+[![platform](https://img.shields.io/badge/platform-Kali-2b8a3e?style=flat-square)](#install)
 
-Interactive menu: pick an interface, discover hosts, set targets, run sessions, watch traffic, toggle anonymity helpers.
+Made by [iinze0](https://github.com/iinze0)
+
+Interactive menu: pick an interface, discover hosts, set targets, run sessions, watch traffic, and toggle anonymity helpers.
 
 ```
 fang/
@@ -23,40 +26,36 @@ fang/
 ## Install
 
 ```bash
-git clone git@github.com:iinze0/fang.git
+git clone https://github.com/iinze0/fang.git
 cd fang
 chmod +x fang.sh update.sh lib/*.sh
 sudo ./fang.sh
 ```
 
-HTTPS works too if you prefer a token over SSH:
+SSH works if you already use keys:
 
 ```bash
-git clone https://github.com/iinze0/fang.git
+git clone git@github.com:iinze0/fang.git
 ```
 
-Root is required. Option `99` in the menu installs packages the script expects.
+Root is required. Menu option `99` installs packages the script expects.
 
 ## Update
 
 From the clone directory:
 
 ```bash
-chmod +x update.sh
 ./update.sh
 ```
 
-Or by hand:
+Or:
 
 ```bash
-cd fang
 git pull origin main
 chmod +x fang.sh update.sh lib/*.sh
 ```
 
-If you copied files without `git clone`, there is nothing to pull — clone the repo once, then use `update.sh`.
-
-Docs: [docs/index.html](docs/index.html)
+`update.sh` only works on a git clone. A copied folder has nothing to pull.
 
 ## Menu
 
@@ -68,9 +67,11 @@ Docs: [docs/index.html](docs/index.html)
 
 ## Disclaimer
 
-Only use on networks you own or have written permission to test.
+Authorized lab and pentest use only. Run this only on networks you own or have written permission to test.
+
+---
 
 <p align="center">
   <a href="https://github.com/iinze0">iinze0</a> ·
-  <a href="https://github.com/iinze0/fang">fang</a>
+  <a href="LICENSE">MIT</a>
 </p>
