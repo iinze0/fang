@@ -3,39 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FANG</title>
+  <title>fang — iinze0</title>
+  <meta name="description" content="fang — modular Kali network toolkit by iinze0.">
   <style>
     :root { color-scheme: dark; }
-    body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; background: #0b0d10; color: #e8edf2; }
-    main { max-width: 720px; margin: 0 auto; padding: 4rem 1.25rem; }
-    h1 { font-size: 3rem; letter-spacing: .12em; margin: 0 0 .5rem; }
-    h2 { margin-top: 2.2rem; font-size: 1.15rem; letter-spacing: .04em; }
-    p { line-height: 1.55; color: #b7c0ca; }
+    body { margin: 0; background: #0b0d10; color: #e8edf2; font: 16px/1.55 ui-sans-serif, system-ui, sans-serif; }
+    main { max-width: 720px; margin: 0 auto; padding: 4rem 1.25rem 5rem; }
+    h1 { font-size: 2.4rem; letter-spacing: -0.03em; margin: 0 0 .35rem; }
+    .by { color: #8b949e; margin: 0 0 2rem; }
+    h2 { margin-top: 2rem; font-size: 1.05rem; }
+    p { color: #b7c0ca; }
     a { color: #8ec8ff; }
-    pre { background: #161a20; padding: 1rem 1.1rem; overflow: auto; border-radius: 8px; }
+    pre { background: #161a20; padding: 1rem 1.1rem; overflow: auto; border-radius: 8px; border: 1px solid #242a32; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; }
   </style>
 </head>
 <body>
   <main>
-    <h1>FANG</h1>
-    <p>Modular Kali toolkit. Private repo: clone, run, then update with git.</p>
-
+    <h1>fang</h1>
+    <p class="by">Modular Kali network toolkit · iinze0 · MIT</p>
     <h2>Install</h2>
-    <pre><code>git clone git@github.com:iinze0/fang.git
+    <pre><code>git clone https://github.com/iinze0/fang.git
 cd fang
 chmod +x fang.sh update.sh lib/*.sh
 sudo ./fang.sh</code></pre>
-
     <h2>Update</h2>
     <pre><code>cd fang
 ./update.sh</code></pre>
-    <p>Or:</p>
-    <pre><code>cd fang
-git pull origin main
-chmod +x fang.sh update.sh lib/*.sh</code></pre>
     <p>Must be a git clone. A copied folder cannot pull updates.</p>
-
+    <p>Authorized lab use only.</p>
     <p><a href="https://github.com/iinze0/fang">github.com/iinze0/fang</a></p>
   </main>
 </body>
