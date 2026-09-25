@@ -1,8 +1,10 @@
-# FANG
+# fang
 
-Modular network toolkit for Kali. Interactive menu: pick an interface, discover hosts, set targets, run sessions, watch traffic, toggle anonymity helpers.
+Modular network toolkit for Kali.
 
-By [iinze0](https://github.com/iinze0).
+Made by [iinze0](https://github.com/iinze0) · [MIT](LICENSE)
+
+Interactive menu: pick an interface, discover hosts, set targets, run sessions, watch traffic, toggle anonymity helpers.
 
 ```
 fang/
@@ -20,13 +22,17 @@ fang/
 
 ## Install
 
-Repo is **private**. Clone with HTTPS + a [personal access token](https://github.com/settings/tokens), or SSH.
-
 ```bash
 git clone git@github.com:iinze0/fang.git
 cd fang
 chmod +x fang.sh update.sh lib/*.sh
 sudo ./fang.sh
+```
+
+HTTPS works too if you prefer a token over SSH:
+
+```bash
+git clone https://github.com/iinze0/fang.git
 ```
 
 Root is required. Option `99` in the menu installs packages the script expects.
@@ -40,7 +46,7 @@ chmod +x update.sh
 ./update.sh
 ```
 
-Same thing by hand:
+Or by hand:
 
 ```bash
 cd fang
@@ -48,20 +54,23 @@ git pull origin main
 chmod +x fang.sh update.sh lib/*.sh
 ```
 
-If you copied files without `git clone`, there is nothing to pull — clone the repo once, then use `update.sh` after that.
+If you copied files without `git clone`, there is nothing to pull — clone the repo once, then use `update.sh`.
 
-Docs page: [docs/index.html](docs/index.html) (same install + update commands).
+Docs: [docs/index.html](docs/index.html)
 
-## Menu (high level)
+## Menu
 
-- Discovery — quick / deep scan, list hosts, nicknames, set single or multi target, protect this host, vendor filter
-- Sessions — lag / kill / timed session, stop, reapply, ping check, session status
-- Monitor — live traffic, rule / latency view
-- Anonymity — ghost mode and anon menu
-- System — custom dir, persistence toggle, save / log, deps install, quit
+- **Discovery** — scan, list hosts, nicknames, single or multi target, protect this host, vendor filter
+- **Sessions** — start, stop, reapply, ping check, session status
+- **Monitor** — live traffic, rule / latency view
+- **Anonymity** — ghost mode and anon menu
+- **System** — custom dir, persistence, save / log, deps install, quit
 
-## License
-
-MIT — see `LICENSE`.
+## Disclaimer
 
 Only use on networks you own or have written permission to test.
+
+<p align="center">
+  <a href="https://github.com/iinze0">iinze0</a> ·
+  <a href="https://github.com/iinze0/fang">fang</a>
+</p>
